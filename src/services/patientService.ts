@@ -1,5 +1,5 @@
 import patients from "../../data/patients";
-import { Patient, patientKeys } from "../types";
+import { Patient, patientKeys, NewPatient } from "../types";
 
 const isKeyOfPatient = (key: string): key is keyof Patient => {
     return patientKeys.some(patientKey => key === patientKey);
@@ -29,4 +29,17 @@ const getPatients = (options: Partial<Record<keyof Patient, boolean>> = {}): Par
     );
 };
 
-export default { getPatients };
+const getRandomInt = (max: number) =>
+    Math.floor(Math.random() * Math.floor(max));
+
+const addPatient = (patient: NewPatient): Patient => {
+    const newPatient = {
+        id: getRandomInt((10 ** 36)).toString(),
+        ...patient
+    };
+
+    patients.push(newPatient);
+    return newPatient;
+};
+
+export default { getPatients, addPatient };

@@ -20,3 +20,7 @@ export interface Patient {
     gender: string;
     occupation: string;
 }
+
+export type NewPatient = Omit<Patient, "id">;
+
+export type UnknownObject = Record<string, unknown>;
