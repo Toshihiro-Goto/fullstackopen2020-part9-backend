@@ -1,31 +1,51 @@
 import patients from "../../data/patients";
-import { Patient, patientKeys, NewPatient } from "../types";
+import { Patient, patientKeys, NewPatient, PatientOption } from "../types";
 
 const isKeyOfPatient = (key: string): key is keyof Patient => {
     return patientKeys.some(patientKey => key === patientKey);
 };
 
-const getPatients = (options: Partial<Record<keyof Patient, boolean>> = {}): Partial<Patient>[] => {
-    if (options === {}) return patients;
-
-    options = {
+const buildFullOption = (options: Partial<PatientOption>): PatientOption => {
+    return {
         id: true,
         name: true,
         dateOfBirth: true,
         ssn: true,
         gender: true,
         occupation: true,
+        entries: true,
         ...options
     };
+};
 
-    const optionPairs = Object.entries(options);
+const filterRequiredProps = (patient: Patient, optionPairs: [string, boolean][]): Partial<Patient> => {
+    return optionPairs.reduce((required, [key, isRequired]) =>
+        (isRequired && isKeyOfPatient(key)) ?
+            { ...required, [key]: patient[key] } :
+            required
+        , {});
+};
+
+function getPatient(id: string): Patient;
+function getPatient(id: string, options: Partial<PatientOption>): Partial<Patient>;
+function getPatient(id: string, options?: Partial<PatientOption>): unknown {
+    const patient = patients.find((patient) => patient.id === id);
+    if (patient == null) throw new Error("The patient not found.");
+
+    if (options == null) return patient;
+    const fullOptions = buildFullOption(options);
+    const optionPairs = Object.entries(fullOptions);
+
+    return filterRequiredProps(patient, optionPairs);
+}
+
+const getPatients = (options: Partial<PatientOption> = {}): Partial<Patient>[] => {
+    if (options === {}) return patients;
+    const fullOptions = buildFullOption(options);
+    const optionPairs = Object.entries(fullOptions);
 
     return patients.map(patient =>
-        optionPairs.reduce((required, [key, isRequired]) =>
-            (!isRequired || !isKeyOfPatient(key)) ?
-                required :
-                { ...required, [key]: patient[key] }
-            , {})
+        filterRequiredProps(patient, optionPairs)
     );
 };
 
@@ -42,4 +62,4 @@ const addPatient = (patient: NewPatient): Patient => {
     return newPatient;
 };
 
-export default { getPatients, addPatient };
+export default { getPatients, addPatient, getPatient };

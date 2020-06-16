@@ -1,11 +1,21 @@
 import express from 'express';
 import patientService from '../services/patientService';
-import toNewPatient from '../utils';
+import { toNewPatient } from '../utils';
 const router = express.Router();
 
 router.get("/", (_req, res) => {
     const patients = patientService.getPatients({ ssn: false });
     res.send(patients);
+});
+
+router.get("/:id", (req, res) => {
+    try {
+        const id = req.params.id;
+        const patient = patientService.getPatient(id);
+        res.send(patient);
+    } catch (e) {
+        if (e instanceof Error) res.status(400).send(e.message);
+    }
 });
 
 router.post("/", (req, res) => {

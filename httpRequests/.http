@@ -1,0 +1,17 @@
+@id = d2773336-f723-11e9-8f0b-362b9e155667
+GET http://localhost:3001/api/patients/{{id}}
+
+###
+GET http://localhost:3001/api/patients
+
+###
+POST http://localhost:3001/api/patients
+Content-Type: application/json
+
+{
+"name": "Yamada Taro",
+"dateOfBirth": "1999-01-01",
+"gender": "male",
+"occupation": "engineer",
+"ssn":"J4P4N"
+}

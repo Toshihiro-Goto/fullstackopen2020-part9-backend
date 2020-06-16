@@ -7,6 +7,7 @@ const toNewPatient = (object: UnknownObject): NewPatient => {
         ssn: parseSsn(object.ssn),
         gender: parseGender(object.gender),
         occupation: parseOccupation(object.occupation),
+        entries: []
     };
 };
 
@@ -57,4 +58,4 @@ const parseOccupation = (occupation: unknown): string => {
     return occupation;
 };
 
-export default toNewPatient;
+export { toNewPatient };
