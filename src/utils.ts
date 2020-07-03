@@ -1,12 +1,12 @@
-import { NewPatient, UnknownObject, Gender } from './types';
+import { NewPatient, Patient, Gender } from './types';
 
-const toNewPatient = (object: UnknownObject): NewPatient => {
+const toNewPatient = (patient: Patient): NewPatient => {
     return {
-        name: parseName(object.name),
-        dateOfBirth: parseDateOfBirth(object.dateOfBirth),
-        ssn: parseSsn(object.ssn),
-        gender: parseGender(object.gender),
-        occupation: parseOccupation(object.occupation),
+        name: parseName(patient.name),
+        dateOfBirth: parseDateOfBirth(patient.dateOfBirth),
+        ssn: parseSsn(patient.ssn),
+        gender: parseGender(patient.gender),
+        occupation: parseOccupation(patient.occupation),
         entries: []
     };
 };
