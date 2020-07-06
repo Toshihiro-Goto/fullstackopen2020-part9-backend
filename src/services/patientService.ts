@@ -1,7 +1,8 @@
 import patients from "../../data/patients";
-import { Patient, patientKeys, NewPatient, PatientOption } from "../types";
+import { Patient, NewPatient, PatientOption } from "../types";
 
-const isKeyOfPatient = (key: string): key is keyof Patient => {
+const isKeyOfPatient = (key: unknown): key is keyof Patient => {
+    const patientKeys: Array<keyof Patient> = ["id", "name", "dateOfBirth", "ssn", "gender", "occupation", "entries"];
     return patientKeys.some(patientKey => key === patientKey);
 };
 

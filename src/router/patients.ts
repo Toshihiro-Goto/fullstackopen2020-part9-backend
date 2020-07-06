@@ -4,8 +4,12 @@ import { toNewPatient } from '../utils';
 const router = express.Router();
 
 router.get("/", (_req, res) => {
-    const patients = patientService.getPatients({ ssn: false });
-    res.send(patients);
+    try {
+        const patients = patientService.getPatients({ ssn: false });
+        res.send(patients);
+    } catch (e) {
+        if (e instanceof Error) res.status(400).send(e.message);
+    }
 });
 
 router.get("/:id", (req, res) => {

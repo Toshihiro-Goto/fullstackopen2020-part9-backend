@@ -4,14 +4,6 @@ export interface Diagnose {
     latin?: string;
 }
 
-export const patientKeys = [
-    "id",
-    "name",
-    "dateOfBirth",
-    "ssn",
-    "gender",
-    "occupation",] as const;
-
 export enum Gender {
     Male = "male",
     Female = "female",
@@ -75,7 +67,7 @@ export interface Patient {
     ssn: string;
     gender: Gender;
     occupation: string;
-    entries: Entry[]
+    entries: Entry[];
 }
 
 export type PublicPatient = Omit<Patient, 'ssn' | 'entries'>;
