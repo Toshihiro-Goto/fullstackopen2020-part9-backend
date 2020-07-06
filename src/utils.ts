@@ -1,17 +1,17 @@
-import { NewPatient, Patient, Gender } from './types';
+import { NewPatient, Gender, UnknownObject, Entry, EntryType } from './types';
 
-const toNewPatient = (patient: Patient): NewPatient => {
+export const toNewPatient = (obj: UnknownObject): NewPatient => {
     return {
-        name: parseName(patient.name),
-        dateOfBirth: parseDateOfBirth(patient.dateOfBirth),
-        ssn: parseSsn(patient.ssn),
-        gender: parseGender(patient.gender),
-        occupation: parseOccupation(patient.occupation),
-        entries: []
+        name: parseName(obj.name),
+        dateOfBirth: parseDateOfBirth(obj.dateOfBirth),
+        ssn: parseSsn(obj.ssn),
+        gender: parseGender(obj.gender),
+        occupation: parseOccupation(obj.occupation),
+        entries: parseEntries(obj.entries)
     };
 };
 
-const isString = (text: unknown): text is string => {
+export const isString = (text: unknown): text is string => {
     return typeof text === 'string' || text instanceof String;
 };
 
@@ -22,7 +22,7 @@ const parseName = (name: unknown): string => {
     return name;
 };
 
-const isDate = (date: string): boolean => {
+export const isDate = (date: string): boolean => {
     return Boolean(Date.parse(date));
 };
 
@@ -40,7 +40,7 @@ const parseSsn = (ssn: unknown): string => {
     return ssn;
 };
 
-const isGender = (param: unknown): param is Gender => {
+export const isGender = (param: unknown): param is Gender => {
     return Object.values(Gender).includes(param as Gender);
 };
 
@@ -58,4 +58,22 @@ const parseOccupation = (occupation: unknown): string => {
     return occupation;
 };
 
-export { toNewPatient };
+export const isUnknownObject = (obj: unknown): obj is UnknownObject => {
+    return typeof obj === 'object' && obj !== null;
+};
+
+export const isEntry = (obj: unknown): obj is Entry => {
+    if (!obj || !isUnknownObject(obj)) return false;
+    return Object.values(EntryType).some(type => type === obj.type);
+};
+
+export const isEntries = (array: unknown[]): array is Entry[] => {
+    return array.every(entry => isEntry(entry));
+};
+
+const parseEntries = (entries: unknown): Entry[] => {
+    if (!entries || !Array.isArray(entries) || !isEntries(entries)) {
+        throw new Error("Incorrect or missing entries:" + (entries as string));
+    }
+    return entries;
+};

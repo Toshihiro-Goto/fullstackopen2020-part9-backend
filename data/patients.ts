@@ -1,7 +1,7 @@
 import { Patient, Gender } from '../src/types';
-import { toNewPatient } from '../src/utils';
+import { toNewPatient, isUnknownObject, isString } from '../src/utils';
 
-const data: Patient[] = [
+const data: unknown[] = [
     {
         id: 'd2773336-f723-11e9-8f0b-362b9e155667',
         name: 'John McClane',
@@ -114,7 +114,13 @@ const data: Patient[] = [
 ];
 
 const patients: Patient[] = data.map(obj => {
+    if (!isUnknownObject(obj)) {
+        throw new Error("Incorrect or missing object:" + (obj as string));
+    }
     const object = toNewPatient(obj) as Patient;
+    if (!isString(obj.id)) {
+        throw new Error("Incorrect or missing id:" + (obj.id as string));
+    }
     object.id = obj.id;
     return object;
 });
