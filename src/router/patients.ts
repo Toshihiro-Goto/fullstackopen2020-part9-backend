@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/", (_req, res) => {
     try {
-        const patients = patientService.getPatients({ ssn: false });
+        const patients = patientService.getPatients();
         res.send(patients);
     } catch (e) {
         if (e instanceof Error) res.status(400).send(e.message);
