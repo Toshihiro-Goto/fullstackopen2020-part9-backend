@@ -1,5 +1,6 @@
 import patients from "../../data/patients";
-import { Patient, NewPatient, PatientOption } from "../types";
+import { Patient, NewPatient, PatientOption, NewEntry } from "../types";
+import { isEntry } from '../utils';
 
 const isKeyOfPatient = (key: unknown): key is keyof Patient => {
     const patientKeys: Array<keyof Patient> = ["id", "name", "dateOfBirth", "ssn", "gender", "occupation", "entries"];
@@ -63,4 +64,16 @@ const addPatient = (patient: NewPatient): Patient => {
     return newPatient;
 };
 
-export default { getPatients, addPatient, getPatient };
+const addEntry = (patientId: string, entry: NewEntry): Patient => {
+    const patient = getPatient(patientId);
+    const newEntry = {
+        id: getRandomInt((10 ** 36)).toString(),
+        ...entry
+    };
+    if (!isEntry(newEntry)) throw new Error(`The object is not Entry.${JSON.stringify(newEntry)}`);
+    patient.entries.push(newEntry);
+    patients.map(p => p.id === patientId ? patient : p);
+    return patient;
+};
+
+export default { getPatients, addPatient, getPatient, addEntry };

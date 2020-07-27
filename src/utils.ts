@@ -1,4 +1,4 @@
-import { NewPatient, Gender, UnknownObject, Entry, EntryType } from './types';
+import { NewPatient, Gender, UnknownObject, Entry, EntryType, NewEntry } from './types';
 
 export const toNewPatient = (obj: UnknownObject): NewPatient => {
     return {
@@ -67,13 +67,70 @@ export const isEntry = (obj: unknown): obj is Entry => {
     return Object.values(EntryType).some(type => type === obj.type);
 };
 
-export const isEntries = (array: unknown[]): array is Entry[] => {
-    return array.every(entry => isEntry(entry));
+export const isEntryArray = (arg: unknown): arg is Entry[] => {
+    if (!Array.isArray(arg)) return false;
+    return arg.every(value => isEntry(value));
 };
 
 const parseEntries = (entries: unknown): Entry[] => {
-    if (!entries || !Array.isArray(entries) || !isEntries(entries)) {
+    if (!entries || !isEntryArray(entries)) {
         throw new Error("Incorrect or missing entries:" + (entries as string));
     }
     return entries;
+};
+
+export const toNewEntry = (obj: UnknownObject): NewEntry => {
+    return {
+        type: parseType(obj.type),
+        description: parseDescription(obj.description),
+        date: parseDate(obj.date),
+        specialist: parseSpecialist(obj.specialist),
+        diagnosisCodes: parseDiagnosisCodes(obj.diagnosisCodes)
+    };
+};
+
+const isEntryType = (arg: unknown): arg is EntryType => {
+    return Object.values(EntryType)
+        .filter(x => typeof x === "string")
+        .some(type => arg === type);
+};
+
+const parseType = (type: unknown): EntryType => {
+    if (!type || !isEntryType(type)) {
+        throw new Error("Incorrect or missing type:" + (type as string));
+    }
+    return type;
+};
+
+const parseDate = (date: unknown): string => {
+    if (!date || !isString(date) || !isDate(date)) {
+        throw new Error("Incorrect or missing date:" + (date as string));
+    }
+    return date;
+};
+
+const parseDescription = (description: unknown): string => {
+    if (!description || !isString(description)) {
+        throw new Error("Incorrect or missing description:" + (description as string));
+    }
+    return description;
+};
+
+const parseSpecialist = (specialist: unknown): string => {
+    if (!specialist || !isString(specialist)) {
+        throw new Error("Incorrect or missing specialist:" + (specialist as string));
+    }
+    return specialist;
+};
+
+const isStringArray = (arg: unknown): arg is string[] => {
+    if (!Array.isArray(arg)) return false;
+    return arg.every(value => isString(value));
+};
+
+const parseDiagnosisCodes = (diagnosisCodes: unknown): string[] | undefined => {
+    if (!diagnosisCodes || !isStringArray(diagnosisCodes)) {
+        throw new Error("Incorrect or missing diagnosisCodes:" + (diagnosisCodes as string));
+    }
+    return diagnosisCodes;
 };

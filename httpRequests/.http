@@ -15,3 +15,15 @@ Content-Type: application/json
 "occupation": "engineer",
 "ssn":"J4P4N"
 }
+
+###
+POST http://localhost:3001/api/patients/{{id}}/entries
+Content-Type: application/json
+
+{
+    "type":"Hospital",
+    "description":"test-desc",
+    "date":"2020-04-01",
+    "specialist":"Dr Yamada",
+    "diagnosisCodes":["S62.5"]
+}
