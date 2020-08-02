@@ -8,7 +8,7 @@ router.get("/", (_req, res) => {
         const patients = patientService.getPatients();
         res.send(patients);
     } catch (e) {
-        if (e instanceof Error) res.status(400).send(e.message);
+        if (e instanceof Error) res.status(400).send({ error: e.message });
     }
 });
 
@@ -18,7 +18,7 @@ router.get("/:id", (req, res) => {
         const patient = patientService.getPatient(id);
         res.send(patient);
     } catch (e) {
-        if (e instanceof Error) res.status(400).send(e.message);
+        if (e instanceof Error) res.status(400).send({ error: e.message });
     }
 });
 
@@ -29,7 +29,7 @@ router.post("/", (req, res) => {
         res.send(addedPatient);
     } catch (e) {
         if (e instanceof Error) {
-            res.status(400).send(e.message);
+            res.status(400).send({ error: e.message });
         }
     }
 });
@@ -38,11 +38,11 @@ router.post("/:id/entries", (req, res) => {
     try {
         const id = req.params.id;
         const newEntry = toNewEntry(req.body);
-        const addedPatient = patientService.addEntry(id, newEntry);
-        res.send(addedPatient);
+        const addedEntry = patientService.addEntry(id, newEntry);
+        res.send(addedEntry);
     } catch (e) {
         if (e instanceof Error) {
-            res.status(400).send(e.message);
+            res.status(400).send({ error: e.message });
         }
     }
 });

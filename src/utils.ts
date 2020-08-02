@@ -1,4 +1,4 @@
-import { NewPatient, Gender, UnknownObject, Entry, EntryType, NewEntry } from './types';
+import { NewPatient, Gender, UnknownObject, Entry, entryTypes, EntryType, NewEntry, HealthCheckRating } from './types';
 
 export const toNewPatient = (obj: UnknownObject): NewPatient => {
     return {
@@ -64,7 +64,7 @@ export const isUnknownObject = (obj: unknown): obj is UnknownObject => {
 
 export const isEntry = (obj: unknown): obj is Entry => {
     if (!obj || !isUnknownObject(obj)) return false;
-    return Object.values(EntryType).some(type => type === obj.type);
+    return entryTypes.some(type => type === obj.type);
 };
 
 export const isEntryArray = (arg: unknown): arg is Entry[] => {
@@ -79,20 +79,33 @@ const parseEntries = (entries: unknown): Entry[] => {
     return entries;
 };
 
+export const assertNever = (arg: never): never => arg;
+
 export const toNewEntry = (obj: UnknownObject): NewEntry => {
-    return {
+    const newEntry = {
         type: parseType(obj.type),
         description: parseDescription(obj.description),
         date: parseDate(obj.date),
         specialist: parseSpecialist(obj.specialist),
         diagnosisCodes: parseDiagnosisCodes(obj.diagnosisCodes)
     };
-};
 
+    const type = newEntry.type;
+
+    switch (type) {
+        case "HealthCheck":
+            return { ...newEntry, type, healthCheckRating: parseHealthCheckRating(obj.healthCheckRating) };
+        case "Hospital":
+            return { ...newEntry, type, discharge: parseDischarge(obj.discharge) };
+        case "OccupationalHealthcare":
+            return { ...newEntry, type, employerName: parseEmployerName(obj.employerName) };
+        default:
+            assertNever(type);
+            throw new Error("The new entry's type field is wrong." + JSON.stringify(newEntry));
+    }
+};
 const isEntryType = (arg: unknown): arg is EntryType => {
-    return Object.values(EntryType)
-        .filter(x => typeof x === "string")
-        .some(type => arg === type);
+    return entryTypes.some(type => arg === type);
 };
 
 const parseType = (type: unknown): EntryType => {
@@ -133,4 +146,34 @@ const parseDiagnosisCodes = (diagnosisCodes: unknown): string[] | undefined => {
         throw new Error("Incorrect or missing diagnosisCodes:" + (diagnosisCodes as string));
     }
     return diagnosisCodes;
+};
+
+const isHealthCheckRating = (arg: unknown): arg is HealthCheckRating => {
+    const healthCheckRatings = Object.values(HealthCheckRating).filter(rating => typeof rating === "number");
+    return healthCheckRatings.some(rating => arg === rating);
+};
+
+const parseHealthCheckRating = (healthCheckRating: unknown): HealthCheckRating => {
+    if (!healthCheckRating || !isHealthCheckRating(healthCheckRating)) {
+        throw new Error("Incorrect or missing healthCheckRating:" + (healthCheckRating as string));
+    }
+    return healthCheckRating;
+};
+
+const isDischarge = (arg: unknown): arg is { date: Date; criteria: string; } => {
+    if (!isUnknownObject(arg) || !arg.date || !isString(arg.date) || !isDate(arg.date) || !arg.criteria || !isString(arg.criteria)) return false;
+    return true;
+};
+const parseDischarge = (discharge: unknown): { date: Date; criteria: string; } => {
+    if (!discharge || !isDischarge(discharge)) {
+        throw new Error("Incorrect or missing discharge:" + JSON.stringify(discharge));
+    }
+    return discharge;
+};
+
+const parseEmployerName = (employerName: unknown): string => {
+    if (!employerName || !isString(employerName)) {
+        throw new Error("Incorrect or missing employerName:" + (employerName as string));
+    }
+    return employerName;
 };

@@ -18,17 +18,15 @@ export interface Diagnosis {
 
 interface BaseEntry {
     id: string;
+    type: EntryType
     description: string;
     date: string;
     specialist: string;
     diagnosisCodes?: Array<Diagnosis['code']>;
 }
 
-export enum EntryType {
-    HealthCheck = "HealthCheck",
-    Hospital = "Hospital",
-    OccupationalHealthcare = "OccupationalHealthcare"
-}
+export const entryTypes = ["HealthCheck", "Hospital", "OccupationalHealthcare"] as const;
+export type EntryType = typeof entryTypes[number];
 
 export enum HealthCheckRating {
     "Healthy" = 0,
@@ -38,12 +36,12 @@ export enum HealthCheckRating {
 }
 
 interface HealthCheckEntry extends BaseEntry {
-    type: EntryType.HealthCheck;
+    type: "HealthCheck"
     healthCheckRating: HealthCheckRating;
 }
 
 interface HospitalEntry extends BaseEntry {
-    type: EntryType.Hospital;
+    type: "Hospital";
     discharge: {
         date: Date;
         criteria: string;
@@ -51,7 +49,7 @@ interface HospitalEntry extends BaseEntry {
 }
 
 interface OccupationalHealthcareEntry extends BaseEntry {
-    type: EntryType.OccupationalHealthcare;
+    type: "OccupationalHealthcare";
     employerName: string;
 }
 
@@ -60,7 +58,9 @@ export type Entry =
     | OccupationalHealthcareEntry
     | HealthCheckEntry;
 
-export type NewEntry = Omit<Entry, "id">;
+type NewObject<T> = T extends infer U ? Omit<U, "id"> : never;
+
+export type NewEntry = NewObject<Entry>;
 
 export interface Patient {
     id: string;
