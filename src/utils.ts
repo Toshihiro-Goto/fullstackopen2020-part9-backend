@@ -154,7 +154,7 @@ const isHealthCheckRating = (arg: unknown): arg is HealthCheckRating => {
 };
 
 const parseHealthCheckRating = (healthCheckRating: unknown): HealthCheckRating => {
-    if (!healthCheckRating || !isHealthCheckRating(healthCheckRating)) {
+    if ((!healthCheckRating && healthCheckRating !== 0) || !isHealthCheckRating(healthCheckRating)) {
         throw new Error("Incorrect or missing healthCheckRating:" + (healthCheckRating as string));
     }
     return healthCheckRating;
